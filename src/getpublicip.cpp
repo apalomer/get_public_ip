@@ -32,7 +32,8 @@ void GetPublicIP::downloadFinished(QNetworkReply* reply)
   QUrl url = reply->url();
   if (reply->error())
   {
-	  std::cout << "Download of " << url.toEncoded().constData() << " failed: " << qPrintable(reply->errorString()) << std::endl;
+    std::cout << "Download of " << url.toEncoded().constData() << " failed: " << qPrintable(reply->errorString())
+              << std::endl;
     return;
   }
 
@@ -48,7 +49,19 @@ void GetPublicIP::downloadFinished(QNetworkReply* reply)
   if (url == getPublicIpServerUrl())
   {
     QString data = QString::fromStdString(reply->readAll().toStdString());
-    std::cout << "Public IP: " << data.toStdString() << std::endl;
+    QRegExp re("(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\."
+               "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\."
+               "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\."
+               "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)");
+    QString ip;
+    if (re.indexIn(data) >= 0)
+    {
+      ip = re.cap(0);
+      std::cout << "Public IP: " << ip.toStdString() << std::endl;
+    }
+    else
+      std::cout << "Did not get an IP: " << data.toStdString() << std::endl;
+    emit gotPublicIP(ip);
   }
 }
 

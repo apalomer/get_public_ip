@@ -12,6 +12,9 @@ public:
    * \param parent
    */
   GetPublicIP(QWidget* parent = nullptr);
+signals:
+
+  void gotPublicIP(QString ip);
 
 protected slots:
 
